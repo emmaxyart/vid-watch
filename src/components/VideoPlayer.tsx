@@ -194,7 +194,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId, videoUrl, metadata }
     if (controlsTimer.current) {
       clearTimeout(controlsTimer.current);
     }
-
     if (isPlaying) {
       controlsTimer.current = window.setTimeout(() => {
         setIsControlsVisible(false);
