@@ -27,8 +27,8 @@ Vid-watch is a modern offline video library web app built with React, TypeScript
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/yourusername/offlinevid.git
-   cd offlinevid
+   git clone https://github.com/yourusername/vid-watch.git
+   cd vid-watch
    ```
 
 2. **Install dependencies:**
