@@ -26,23 +26,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId, videoUrl, metadata }
   const [isBuffering, setIsBuffering] = useState(false);
   
   // Control visibility timer
-  let controlsTimer: number | null = null;
-  
+  const controlsTimer = useRef<number | null>(null);
+
   // Initialize player
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    
+
     // Set initial volume
     video.volume = volume;
-    
+
     // Enable hardware acceleration
     video.style.transform = 'translateZ(0)';
-    
+
     // Set playback settings
     video.playsInline = true;
     video.disableRemotePlayback = true;
-    
+
     // Set initial position if there's a saved progress
     if (metadata.watchProgress && metadata.duration) {
       const targetTime = metadata.watchProgress * metadata.duration;
@@ -51,49 +51,78 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId, videoUrl, metadata }
         setCurrentTime(targetTime);
       }
     }
-    
+
     // Handle keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key.toLowerCase()) {
         case ' ':
         case 'k':
-          togglePlay();
+          if (video.paused) {
+            video.play();
+            setIsPlaying(true);
+          } else {
+            video.pause();
+            setIsPlaying(false);
+          }
           e.preventDefault();
           break;
         case 'f':
-          toggleFullscreen();
+          if (!document.fullscreenElement) {
+            playerRef.current?.requestFullscreen().catch(err => {
+              console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+          } else {
+            document.exitFullscreen();
+          }
           e.preventDefault();
           break;
         case 'm':
-          toggleMute();
+          video.muted = !video.muted;
+          setIsMuted(video.muted);
           e.preventDefault();
           break;
         case 'arrowright':
-          skip(10);
+          video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + 10));
+          setCurrentTime(video.currentTime);
           e.preventDefault();
           break;
         case 'arrowleft':
-          skip(-10);
+          video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime - 10));
+          setCurrentTime(video.currentTime);
           e.preventDefault();
           break;
-        case 'arrowup':
-          changeVolume(0.1);
+        case 'arrowup': {
+          const newVolume = Math.max(0, Math.min(1, video.volume + 0.1));
+          video.volume = newVolume;
+          setVolume(newVolume);
+          if (newVolume > 0 && video.muted) {
+            video.muted = false;
+            setIsMuted(false);
+          }
           e.preventDefault();
           break;
-        case 'arrowdown':
-          changeVolume(-0.1);
+        }
+        case 'arrowdown': {
+          const newVolume = Math.max(0, Math.min(1, video.volume - 0.1));
+          video.volume = newVolume;
+          setVolume(newVolume);
+          if (newVolume === 0 && !video.muted) {
+            video.muted = true;
+            setIsMuted(true);
+          }
           e.preventDefault();
           break;
+        }
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      if (controlsTimer) clearTimeout(controlsTimer);
+      if (controlsTimer.current) clearTimeout(controlsTimer.current);
     };
-  }, [metadata]);
+  }, [metadata, volume]);
   
   // Handle video events
   useEffect(() => {
@@ -161,13 +190,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId, videoUrl, metadata }
   // Handle controls visibility
   const showControls = () => {
     setIsControlsVisible(true);
-    
-    if (controlsTimer) {
-      clearTimeout(controlsTimer);
+
+    if (controlsTimer.current) {
+      clearTimeout(controlsTimer.current);
     }
-    
+
     if (isPlaying) {
-      controlsTimer = window.setTimeout(() => {
+      controlsTimer.current = window.setTimeout(() => {
         setIsControlsVisible(false);
       }, 3000);
     }

@@ -18,29 +18,7 @@ const UploadZone: React.FC = () => {
     setIsDragging(false);
   }, []);
 
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length === 0) return;
-    
-    await handleFilesUpload(files);
-  }, [addVideo]);
-
-  const handleFileInputChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-    
-    await handleFilesUpload(files);
-    
-    // Reset the input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }, [addVideo]);
-
-  const handleFilesUpload = async (files: File[]) => {
+  const handleFilesUpload = useCallback(async (files: File[]) => {
     const videoFiles = files.filter(file => file.type.startsWith('video/'));
     
     if (videoFiles.length === 0) {
@@ -59,7 +37,29 @@ const UploadZone: React.FC = () => {
     } finally {
       setIsUploading(false);
     }
-  };
+  }, [addVideo]);
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length === 0) return;
+    
+    await handleFilesUpload(files);
+  }, [handleFilesUpload]);
+
+  const handleFileInputChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
+    await handleFilesUpload(files);
+    
+    // Reset the input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [handleFilesUpload]);
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
