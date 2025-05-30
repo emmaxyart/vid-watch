@@ -198,7 +198,63 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId, videoUrl, metadata }
       controlsTimer.current = window.setTimeout(() => {
         setIsControlsVisible(false);
       }, 3000);
-    }
+    }    // ...existing code...
+    return (
+      <div
+        ref={playerRef}
+        className={`relative group aspect-video w-full max-w-4xl mx-auto bg-black`}
+        onMouseMove={showControls}
+        onClick={togglePlay}
+      >
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          className="w-full h-full object-contain bg-black"
+          style={{
+            display: 'block',
+            background: '#000',
+            transform: 'translateZ(0)',
+            WebkitTransform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden'
+          }}
+          autoPlay={false}
+          preload="metadata"
+          playsInline
+          disableRemotePlayback
+        />
+        {/* ...controls and overlays... */}
+      </div>
+    );
+    // ...existing code...    // ...existing code...
+    return (
+      <div
+        ref={playerRef}
+        className={`relative group aspect-video w-full max-w-4xl mx-auto bg-black`}
+        onMouseMove={showControls}
+        onClick={togglePlay}
+      >
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          className="w-full h-full object-contain bg-black"
+          style={{
+            display: 'block',
+            background: '#000',
+            transform: 'translateZ(0)',
+            WebkitTransform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden'
+          }}
+          autoPlay={false}
+          preload="metadata"
+          playsInline
+          disableRemotePlayback
+        />
+        {/* ...controls and overlays... */}
+      </div>
+    );
+    // ...existing code...
   };
   
   // Player controls
